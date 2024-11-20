@@ -32,6 +32,8 @@ class SavingsAccount(BankAccount):
 
 
 class CheckingAccount(BankAccount):
+    def __init__(self, owner: str, balance: float = 0, interest_rate: float = 0.05):
+        super().__init__(owner, balance)
     def withdraw(self, amount: float):
         self._BankAccount__balance -= amount
 

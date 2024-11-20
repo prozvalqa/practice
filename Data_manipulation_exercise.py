@@ -3,7 +3,7 @@ from datetime import datetime
 
 def get_operator():
     return {
-        "email": "prozvalqa@gmail.com",
+        "email": "prozval999@gmail.com",
         "name": "Val"
     }
 
@@ -121,8 +121,8 @@ def count_status(response):
 
 
 report = {
-    "Контакты": get_operator(),
-    "ID всех заказов": orders_id(response),
-    "Статусы заказов": count_status(response)
+    "Contacts": get_operator(),
+    "Order ID's": orders_id(response),
+    "Order status's": count_status(response)
 }
 print(report)
