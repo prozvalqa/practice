@@ -67,7 +67,7 @@ if "data" in response and isinstance(response["data"], list) and len(response["d
     first_duration = (first_completed_at - first_started_at).total_seconds() / 3600  # в часах
     second_duration = (second_completed_at - second_started_at).total_seconds() / 3600  # в часах
 
-    # Проверяем укладывается ли в 6 часов
+    # Проверяем, укладывается ли в 6 часов
     if first_duration <= 6 and second_duration <= 6:
         print("Время выполнения первых двух заказов не превышает 6 часов.")
     else:

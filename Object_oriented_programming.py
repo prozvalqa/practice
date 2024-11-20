@@ -36,7 +36,7 @@ class CheckingAccount(BankAccount):
         self._BankAccount__balance -= amount
 
 
-account = SavingsAccount("Alice")
+account = SavingsAccount("Valera")
 print(account.get_balance())
 
 account.deposit(500)
