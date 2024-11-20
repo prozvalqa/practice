@@ -1,0 +1,7 @@
+# Исключение для PyCharm
+.idea/
+
+# Исключение для Python
+__pycache__/
+*.pyc
+*.pyo
