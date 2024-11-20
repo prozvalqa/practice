@@ -4,7 +4,7 @@ from datetime import datetime
 def get_operator():
     return {
         "email": "prozvalqa@gmail.com",
-        "name": "Valeriy"
+        "name": "Val"
     }
 
 
