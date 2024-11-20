@@ -7,6 +7,7 @@ def get_operator():
         "name": "Valeriy"
     }
 
+
 response = {
     "state": 0,
     "data": [
@@ -46,12 +47,12 @@ response = {
     ]
 }
 
-# Надо убедиться, что заказы вообще есть в ответе от сервера
+# 1 Надо убедиться, что заказы вообще есть в ответе от сервера
 if "data" in response and isinstance(response["data"], list) and len(response["data"]) > 0:
     count = len(response["data"])
     print(f"В ответе есть заказы, их количество: {count}")
 
-# Надо убедиться, что время выполнение первого и второго заказов не превышает 6 часов
+# 2 Надо убедиться, что время выполнение первого и второго заказов не превышает 6 часов
 if "data" in response and isinstance(response["data"], list) and len(response["data"]) >= 2:
 
     # Получаем startedAt и completedAt для первого заказа
@@ -74,7 +75,7 @@ if "data" in response and isinstance(response["data"], list) and len(response["d
 else:
     print("Массив data пуст или содержит менее двух заказов.")
 
-# Надо убедиться, что для третьего заказа все услуги обработаны И выполнено не меньше половины. Ну или по крайней мере
+# 3 Надо убедиться, что для третьего заказа все услуги обработаны И выполнено не меньше половины. Ну или по крайней мере
 # на текущий момент возвращено не больше, чем выполнено, а ожидают возврат не больше, чем уже возвращено
 
 if "data" in response and isinstance(response["data"], list) and response["data"]:
@@ -125,4 +126,3 @@ report = {
     "Статусы заказов": count_status(response)
 }
 print(report)
-
