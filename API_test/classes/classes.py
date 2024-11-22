@@ -19,14 +19,14 @@ class ApiClient:
         response = requests.post(
             f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
-        # Если нет тела ответа
+        # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
             try:
                 response_json = response.json()
                 return response.status_code, response_json
         # Попытка распарсить json
             except ValueError:
-                return response.text, response.status_code
+                return response.status_code, response.text
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
@@ -34,14 +34,14 @@ class ApiClient:
         response = requests.get(
             f"{BASE_URL}{endpoint}", params=params, headers=self.create_headers()
         )
-        # Если нет тела ответа
+        # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
             try:
                 response_json = response.json()
                 return response.status_code, response_json
             # Попытка распарсить json
             except ValueError:
-                return response.text, response.status_code
+                return response.status_code, response.text
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
@@ -49,13 +49,13 @@ class ApiClient:
         response = requests.delete(
             f"{BASE_URL}{endpoint}", json=payload, headers=self.create_headers()
         )
-        # Если нет тела ответа
-        if response.status_code == 201 and response.content:
+        # Если есть тело ответа и код 201
+        if response.status_code == 201:
             try:
                 return response.status_code, response.text
             # Попытка распарсить json
             except ValueError:
-                return response.text, response.status_code
+                return response.status_code, response.text
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
@@ -63,14 +63,14 @@ class ApiClient:
         response = requests.put(
             f"{BASE_URL}{endpoint}", json=payload, headers=self.create_headers()
         )
-        # Если нет тела ответа
+        # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
             try:
                 response_json = response.json()
                 return response.status_code, response_json
             # Попытка распарсить json
             except ValueError:
-                return response.text, response.status_code
+                return response.status_code, response.text
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
@@ -78,14 +78,14 @@ class ApiClient:
         response = requests.patch(
             f"{BASE_URL}{endpoint}", json=payload, headers=self.create_headers()
         )
-        # Если нет тела ответа
+        # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
             try:
                 response_json = response.json()
                 return response.status_code, response_json
             # Попытка распарсить json
             except ValueError:
-                return response.text, response.status_code
+                return response.status_code, response.text
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
@@ -103,12 +103,11 @@ class Auth(ApiClient):
             payload={"username": username, "password": password},
             headers=self.create_headers()
         )
-        if status_code != 200:
-            raise ValueError(f"Authentication failed: {response_json}")
-        token = response_json.get("token")
-        if not token:
-            raise ValueError(f"Token not found in response: {response_json}")
-        return token
+        if status_code == 200:
+            token = response_json.get("token")
+            return token
+        else:
+            return status_code
 
 
 class BookingManager(ApiClient):
@@ -120,26 +119,34 @@ class BookingManager(ApiClient):
             endpoint="booking",
             payload=booking_data
         )
-        print(response_json)
-        if status_code != 200:
-            raise ValueError(f"Booking creation failed: {response_json}")
-        booking_id = response_json.get("bookingid")
-        if not booking_id:
-            raise ValueError(f"Bookingid not found in response: {response_json}")
-        return status_code, response_json, booking_id
+        print("Создание букинга", response_json)
+        if status_code == 200:
+            booking_id = response_json.get("bookingid")
+            return status_code, response_json, booking_id
+        else:
+            return status_code, None, None
 
     def receive_current_booking(self, booking_id):
         status_code, response_json = self.get(
             endpoint=f"booking/{booking_id}"
         )
-        if status_code == 404:
-            return status_code, {"error": "Booking not found"}
-        if status_code != 200:
-            raise ValueError(f"Getting a booking failed: {response_json}")
-        return status_code, response_json
+        print("Получение букинга", response_json)
+        if status_code == 200:
+            return status_code, response_json
+        else:
+            return status_code, None
 
     def delete_booking(self, booking_id):
-        status_code, response_text = self.delete(endpoint=f"booking/{booking_id}")
-        if status_code != 201:
-            raise ValueError(f"Booking deletion failed: {response_text}")
+        status_code, _ = self.delete(endpoint=f"booking/{booking_id}")
         return status_code
+
+    def put_booking(self, booking_id, booking_data):
+        status_code, response_json = self.put(
+            endpoint=f"booking/{booking_id}",
+            payload=booking_data
+        )
+        print("Изменение букинга", response_json)
+        if status_code == 200:
+            return status_code, response_json
+        else:
+            return status_code, None

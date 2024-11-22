@@ -20,7 +20,7 @@ def validate_schema(response_json, schema):
         raise AssertionError(f"Ошибка валидации схемы: {e.message}")
 
 
-def receive_booking_id(booking_id, booking_manager, booking_data):
+def receive_and_check_booking_id(booking_id, booking_manager, booking_data):
     receiving_status_code, receiving_response_json = booking_manager.receive_current_booking(booking_id=booking_id)
     assert receiving_status_code == 200
     assert receiving_response_json['firstname'] == booking_data['firstname'], "Имя не совпадает с заданным"
@@ -31,3 +31,4 @@ def receive_booking_id(booking_id, booking_manager, booking_data):
         'checkin'], "Дата заезда не совпадает"
     assert receiving_response_json['bookingdates']['checkout'] == booking_data['bookingdates'][
         'checkout'], "Дата выезда не совпадает"
+    return receiving_response_json
