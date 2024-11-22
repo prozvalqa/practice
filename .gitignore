@@ -5,3 +5,8 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Ignore virtual environments
+venv/
+
+.pytest_cache/
