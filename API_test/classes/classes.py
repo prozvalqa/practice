@@ -30,9 +30,11 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def get(self, endpoint, params=None):
+    def get(self, endpoint, params=None, headers=None):
+        if headers is None:
+            headers = self.create_headers()
         response = requests.get(
-            f"{BASE_URL}{endpoint}", params=params, headers=self.create_headers()
+            f"{BASE_URL}{endpoint}", params=params, headers=headers
         )
         # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
@@ -45,9 +47,11 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def delete(self, endpoint, payload=None):
+    def delete(self, endpoint, payload=None, headers=None):
+        if headers is None:
+            headers = self.create_headers()
         response = requests.delete(
-            f"{BASE_URL}{endpoint}", json=payload, headers=self.create_headers()
+            f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
         # Если есть тело ответа и код 201
         if response.status_code == 201:
@@ -59,9 +63,11 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def put(self, endpoint, payload):
+    def put(self, endpoint, payload, headers=None):
+        if headers is None:
+            headers = self.create_headers()
         response = requests.put(
-            f"{BASE_URL}{endpoint}", json=payload, headers=self.create_headers()
+            f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
         # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
@@ -74,9 +80,11 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def patch(self, endpoint, payload):
+    def patch(self, endpoint, payload, headers=None):
+        if headers is None:
+            headers = self.create_headers()
         response = requests.patch(
-            f"{BASE_URL}{endpoint}", json=payload, headers=self.create_headers()
+            f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
         # Если есть тело ответа и код 200
         if response.status_code == 200 and response.content:
@@ -114,21 +122,22 @@ class BookingManager(ApiClient):
     def __init__(self, token=None):
         super().__init__(token)
 
-    def create_booking(self, booking_data):
+    def create_booking(self, booking_data, headers=None):
         status_code, response_json = self.post(
             endpoint="booking",
-            payload=booking_data
+            payload=booking_data,
+            headers=headers
         )
-        print("Создание букинга", response_json)
         if status_code == 200:
             booking_id = response_json.get("bookingid")
             return status_code, response_json, booking_id
         else:
             return status_code, None, None
 
-    def receive_current_booking(self, booking_id):
+    def receive_current_booking(self, booking_id, headers=None):
         status_code, response_json = self.get(
-            endpoint=f"booking/{booking_id}"
+            endpoint=f"booking/{booking_id}",
+            headers=headers
         )
         print("Получение букинга", response_json)
         if status_code == 200:
@@ -136,14 +145,20 @@ class BookingManager(ApiClient):
         else:
             return status_code, None
 
-    def delete_booking(self, booking_id):
-        status_code, _ = self.delete(endpoint=f"booking/{booking_id}")
+    def delete_booking(self, booking_id, headers=None):
+        status_code, _ = self.delete(
+            endpoint=f"booking/{booking_id}",
+            headers=headers
+        )
+        print(headers)
+        print(status_code)
         return status_code
 
-    def put_booking(self, booking_id, booking_data):
+    def put_booking(self, booking_id, booking_data, headers=None):
         status_code, response_json = self.put(
             endpoint=f"booking/{booking_id}",
-            payload=booking_data
+            payload=booking_data,
+            headers=headers
         )
         print("Изменение букинга", response_json)
         if status_code == 200:

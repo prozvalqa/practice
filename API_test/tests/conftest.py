@@ -33,7 +33,7 @@ def api_client(auth_token):
 
 
 @pytest.fixture
-# Создаём экземпляр класса BookingManager
+# Создаём экземпляр класса BookingManager с токеном
 def booking_manager(auth_token):
     booking_manager = BookingManager(token=auth_token)
     return booking_manager

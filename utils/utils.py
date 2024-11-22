@@ -2,9 +2,55 @@ import json
 from pathlib import Path
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from API_test.classes.classes import Auth
 
 
-# Функция для валидации схем
+# Функция для создания базовых хедеров
+def create_headers(class_object, auth_type="valid", content_type="valid", accept="valid"):
+
+    token = class_object.token
+    headers = {}
+
+    # Обработка заголовка Authorization
+    if auth_type == "invalid":
+        headers["Cookie"] = f"Bearer 'invalid_token'"
+    elif auth_type == "empty":
+        headers["Cookie"] = None  # type: ignore
+    elif auth_type == "without":
+        pass  # Не добавляем Cookie
+    elif auth_type == "empty_string":
+        headers["Cookie"] = ""
+    else:  # valid
+        headers["Cookie"] = f"token={token}"
+
+    # Обработка заголовка Content-Type
+    if content_type == "invalid":
+        headers["Content-Type"] = "text/plain"
+    elif content_type == "empty":
+        headers["Content-Type"] = None  # type: ignore
+    elif content_type == "without":
+        pass  # Не добавляем Content-Type
+    elif content_type == "empty_string":
+        headers["Content-Type"] = ""
+    else:  # valid
+        headers["Content-Type"] = "application/json"
+
+    # Обработка заголовка Accept
+    if accept == "invalid":
+        headers["Accept"] = "text/plain"
+    elif accept == "empty":
+        headers["Accept"] = None  # type: ignore
+    elif accept == "without":
+        pass  # Не добавляем Accept
+    elif accept == "empty_string":
+        headers["Accept"] = ""
+    else:  # valid
+        headers["Accept"] = "application/json"
+
+    return headers
+
+
+# Функция для загрузки схем
 def load_all_schemas(directory="API_test/schemas"):
     schemas = {}
     for schema_file in Path(directory).glob("*.json"):  # Загружаем все JSON файлы в директории
@@ -13,6 +59,7 @@ def load_all_schemas(directory="API_test/schemas"):
     return schemas
 
 
+# Функция для валидации схем
 def validate_schema(response_json, schema):
     try:
         validate(instance=response_json, schema=schema)
@@ -20,6 +67,7 @@ def validate_schema(response_json, schema):
         raise AssertionError(f"Ошибка валидации схемы: {e.message}")
 
 
+# Функция для получения и проверки созданного букинга
 def receive_and_check_booking_id(booking_id, booking_manager, booking_data):
     receiving_status_code, receiving_response_json = booking_manager.receive_current_booking(booking_id=booking_id)
     assert receiving_status_code == 200
