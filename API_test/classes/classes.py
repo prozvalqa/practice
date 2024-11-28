@@ -6,16 +6,7 @@ class ApiClient:
     def __init__(self, token=None):
         self.token = token
 
-    def create_headers(self):
-        return {
-            "Cookie": f"token={self.token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-
-    def post(self, endpoint, payload, headers=None):
-        if headers is None:
-            headers = self.create_headers()
+    def post(self, endpoint, payload, headers):
         response = requests.post(
             f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
@@ -30,9 +21,7 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def get(self, endpoint, params=None, headers=None):
-        if headers is None:
-            headers = self.create_headers()
+    def get(self, endpoint, headers, params=None):
         response = requests.get(
             f"{BASE_URL}{endpoint}", params=params, headers=headers
         )
@@ -47,9 +36,7 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def delete(self, endpoint, payload=None, headers=None):
-        if headers is None:
-            headers = self.create_headers()
+    def delete(self, endpoint, headers, payload=None):
         response = requests.delete(
             f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
@@ -63,9 +50,8 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def put(self, endpoint, payload, headers=None):
-        if headers is None:
-            headers = self.create_headers()
+    def put(self, endpoint, payload, headers):
+
         response = requests.put(
             f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
@@ -80,9 +66,7 @@ class ApiClient:
         # Возврат для случаев с ошибками или пустым телом
         return response.status_code, response.text
 
-    def patch(self, endpoint, payload, headers=None):
-        if headers is None:
-            headers = self.create_headers()
+    def patch(self, endpoint, payload, headers):
         response = requests.patch(
             f"{BASE_URL}{endpoint}", json=payload, headers=headers
         )
@@ -100,7 +84,7 @@ class ApiClient:
 
 class Auth(ApiClient):
 
-    def create_headers(self):
+    def create_auth_headers(self):
         return {
             "Content-Type": "application/json"
         }
@@ -109,8 +93,9 @@ class Auth(ApiClient):
         status_code, response_json = self.post(
             endpoint="auth",
             payload={"username": username, "password": password},
-            headers=self.create_headers()
+            headers=self.create_auth_headers()
         )
+        print(response_json)
         if status_code == 200:
             token = response_json.get("token")
             return token
@@ -122,30 +107,25 @@ class BookingManager(ApiClient):
     def __init__(self, token=None):
         super().__init__(token)
 
-    def create_booking(self, booking_data, headers=None):
+    def create_booking(self, booking_data, headers):
         status_code, response_json = self.post(
             endpoint="booking",
             payload=booking_data,
             headers=headers
         )
-        if status_code == 200:
-            booking_id = response_json.get("bookingid")
-            return status_code, response_json, booking_id
-        else:
-            return status_code, None, None
+        print(headers)
+        print(response_json)
+        booking_id = response_json.get("bookingid") if isinstance(response_json, dict) else None
+        return status_code, booking_id, response_json
 
-    def receive_current_booking(self, booking_id, headers=None):
+    def receive_current_booking(self, booking_id, headers):
         status_code, response_json = self.get(
             endpoint=f"booking/{booking_id}",
             headers=headers
         )
-        print("Получение букинга", response_json)
-        if status_code == 200:
-            return status_code, response_json
-        else:
-            return status_code, None
+        return status_code, response_json
 
-    def delete_booking(self, booking_id, headers=None):
+    def delete_booking(self, booking_id, headers):
         status_code, _ = self.delete(
             endpoint=f"booking/{booking_id}",
             headers=headers
@@ -160,8 +140,6 @@ class BookingManager(ApiClient):
             payload=booking_data,
             headers=headers
         )
-        print("Изменение букинга", response_json)
-        if status_code == 200:
-            return status_code, response_json
-        else:
-            return status_code, None
+        print(headers)
+        print(response_json)
+        return status_code, response_json

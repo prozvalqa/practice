@@ -1,10 +1,14 @@
 from utils.utils import validate_schema
 from utils.utils import receive_and_check_booking_id
+from utils.utils import create_headers
 
 
 def test_create_booking(booking_manager, booking_data, all_schemas):
-    creation_status_code, creation_response_json, booking_id = booking_manager.create_booking(
-        booking_data=booking_data
+    headers = create_headers(booking_manager)
+
+    creation_status_code, booking_id, creation_response_json = booking_manager.create_booking(
+        booking_data=booking_data,
+        headers=headers
     )
     assert creation_status_code == 200
 
@@ -19,13 +23,15 @@ def test_create_booking(booking_manager, booking_data, all_schemas):
 
     # Удаление букинга
     delete_booking_status_code = booking_manager.delete_booking(
-        booking_id=booking_id
+        booking_id=booking_id,
+        headers=headers
     )
     assert delete_booking_status_code == 201
 
     # Попытка получения удаленного букинга
     deleted_booking_status_code, _ = booking_manager.receive_current_booking(
-        booking_id=booking_id
+        booking_id=booking_id,
+        headers=headers
     )
     assert deleted_booking_status_code == 404
 

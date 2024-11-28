@@ -6,7 +6,7 @@ from API_test.classes.classes import Auth
 
 
 # Функция для создания базовых хедеров
-def create_headers(class_object, auth_type="valid", content_type="valid", accept="valid"):
+def create_headers(class_object=None, auth_type="valid", content_type="valid", accept="valid"):
 
     token = class_object.token
     headers = {}
@@ -69,7 +69,11 @@ def validate_schema(response_json, schema):
 
 # Функция для получения и проверки созданного букинга
 def receive_and_check_booking_id(booking_id, booking_manager, booking_data):
-    receiving_status_code, receiving_response_json = booking_manager.receive_current_booking(booking_id=booking_id)
+    headers = create_headers(booking_manager)
+    receiving_status_code, receiving_response_json = booking_manager.receive_current_booking(
+        booking_id=booking_id,
+        headers=headers
+    )
     assert receiving_status_code == 200
     assert receiving_response_json['firstname'] == booking_data['firstname'], "Имя не совпадает с заданным"
     assert receiving_response_json['lastname'] == booking_data['lastname'], "Фамилия не совпадает с заданной"

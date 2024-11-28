@@ -54,4 +54,3 @@ def booking_data():
         "additionalneeds": "Breakfast"
     }
 
-
